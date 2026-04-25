@@ -200,6 +200,46 @@ textarea{resize:vertical;min-height:54px}
 .dchip.active{background:var(--a);border-color:var(--a);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .dchip:active{transform:scale(.95)}
 
+/* EDITED BILL */
+.sale-card.edited{border-color:var(--o);background:rgba(234,88,12,.05)}
+.edited-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;background:var(--obg);color:var(--o);border:1px solid var(--obr)}
+.edit-field-changed{color:var(--o);font-weight:700}
+
+/* RETURN / EXCHANGE */
+.sale-card.returned{border-color:#8b5cf6;background:rgba(139,92,246,.05)}
+.sale-card.exchanged{border-color:#06b6d4;background:rgba(6,182,212,.05)}
+.re-badge-return{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(139,92,246,.12);color:#8b5cf6;border:1px solid rgba(139,92,246,.3)}
+.re-badge-exchange{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(6,182,212,.12);color:#06b6d4;border:1px solid rgba(6,182,212,.3)}
+.re-item-row{display:flex;align-items:center;gap:10px;padding:9px 10px;background:var(--s2);border:1.5px solid var(--b);border-radius:var(--rad);margin-bottom:6px;cursor:pointer;user-select:none;transition:all .15s}
+.re-item-row.selected{border-color:var(--o);background:var(--obg)}
+.re-item-chk{width:20px;height:20px;border-radius:5px;border:2px solid var(--b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s}
+.re-item-row.selected .re-item-chk{background:var(--o);border-color:var(--o);color:#fff}
+.re-new-item-row{display:flex;gap:8px;align-items:center;margin-bottom:7px}
+.re-new-item-name{flex:1;font-size:13px}
+.re-new-item-price{width:90px;text-align:right;font-size:14px;font-weight:700}
+
+/* CUSTOMER HISTORY PANEL */
+.cust-hist-panel{margin-top:10px;border-top:1px solid var(--b);padding-top:10px}
+.cust-hist-title{font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.cust-bill-row{background:var(--s3);border:1.5px solid var(--b2);border-radius:var(--rad);padding:10px 12px;margin-bottom:7px;cursor:default}
+.cust-bill-row.selectable{cursor:pointer;transition:border-color .15s}
+.cust-bill-row.selectable:active{border-color:var(--a)}
+.cust-bill-meta{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.cust-bill-date{font-size:10px;color:var(--t3)}
+.cust-bill-amt{font-size:15px;font-weight:800;color:var(--a)}
+.cust-bill-items{font-size:11px;color:var(--t2);margin-bottom:8px}
+.cust-bill-actions{display:flex;gap:6px;flex-wrap:wrap}
+.cust-action-btn{padding:5px 11px;border-radius:8px;border:none;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s}
+.cust-action-btn:active{transform:scale(.96)}
+
+/* EDIT MODAL ITEM ROW */
+.edit-item-row{display:flex;align-items:center;gap:8px;padding:8px;background:var(--s2);border:1px solid var(--b);border-radius:8px;margin-bottom:6px}
+.edit-item-name{flex:1;font-size:13px;font-weight:600;color:var(--t)}
+.edit-item-price{width:90px;text-align:right;font-size:14px;font-weight:700}
+.cancel-item-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--rbg);border:1px solid var(--rbr);border-radius:8px;margin-bottom:6px}
+.cancel-item-name{flex:1;font-size:13px;color:var(--t2)}
+.cancel-item-check{width:20px;height:20px;border-radius:5px;border:2px solid var(--r);cursor:pointer;flex-shrink:0;background:transparent;display:flex;align-items:center;justify-content:center}
+
 /* CODE TABLE */
 .code-table{width:100%;border-collapse:collapse;font-size:12px}
 .code-table th{color:var(--t3);font-size:10px;text-align:left;padding:5px 7px;border-bottom:1px solid var(--b)}
@@ -271,10 +311,46 @@ select.native{background:var(--s2);border:1.5px solid var(--b);border-radius:var
   <div id="salesman-chips" style="margin-bottom:12px"></div>
 
   <div class="sec">Customer</div>
-  <div class="card" style="padding:12px">
-    <div class="r2">
-      <div><label>Name (optional)</label><input type="text" id="cust-name" placeholder="Customer name"></div>
-      <div><label>Mobile (WhatsApp)</label><input type="tel" id="cust-mobile" placeholder="91xxxxxxxxxx"></div>
+  <div class="card" style="padding:12px" id="cust-card">
+    <div>
+      <label>Mobile (WhatsApp)</label>
+      <div style="position:relative">
+        <input type="tel" id="cust-mobile" placeholder="91xxxxxxxxxx"
+          oninput="onMobileInput(this.value)"
+          style="padding-right:36px">
+        <span id="mobile-fetch-icon" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none"></span>
+      </div>
+    </div>
+    <div style="margin-top:10px">
+      <label>Name (optional)</label>
+      <input type="text" id="cust-name" placeholder="Customer name">
+    </div>
+
+    <!-- Known customer found banner -->
+    <div id="cust-found-banner" style="display:none;margin-top:10px;padding:10px;background:var(--gbg);border:1.5px solid var(--gbr);border-radius:var(--rad);align-items:center;gap:10px">
+      <span style="font-size:22px">👤</span>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:800;color:var(--g)" id="cfb-name"></div>
+        <div style="font-size:11px;color:var(--t2);margin-top:1px" id="cfb-stats"></div>
+      </div>
+      <button onclick="useFetchedCustomer()"
+        style="background:var(--g);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">
+        Use ✓
+      </button>
+    </div>
+
+    <!-- Customer bill history — staff can action, cannot see profit -->
+    <div id="cust-hist-panel" style="display:none">
+      <div class="cust-hist-panel">
+        <div class="cust-hist-title">
+          <span>📋</span>
+          <span id="cust-hist-label">Previous Bills</span>
+        </div>
+        <!-- summary row -->
+        <div id="cust-hist-summary" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"></div>
+        <!-- bill cards -->
+        <div id="cust-hist-bills"></div>
+      </div>
     </div>
   </div>
 
@@ -411,8 +487,9 @@ select.native{background:var(--s2);border:1.5px solid var(--b);border-radius:var
 <!-- ===== HISTORY PAGE ===== -->
 <div class="page" id="page-history">
 
-  <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-    <button class="btn btn-ghost btn-sm" onclick="lockHistoryNow()">🔒 Lock History</button>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <button class="btn btn-ghost btn-sm" onclick="lockHistoryNow()">🔒 Lock</button>
+    <button class="btn btn-red btn-sm" onclick="confirmClearHistory()" style="width:auto">🗑 Clear History</button>
   </div>
 
   <div class="hist-top-grid">
@@ -553,20 +630,18 @@ select.native{background:var(--s2);border:1.5px solid var(--b);border-radius:var
     </div>
   </div>
 
-  <div class="sec">☁️ Cloud Sync (Firebase)</div>
+  <div class="sec">☁️ Firebase Cloud Sync</div>
   <div class="card">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
       <div>
-        <div style="font-size:13px;font-weight:700;color:var(--t)">Firebase Sync</div>
-        <div style="font-size:11px;color:var(--t3);margin-top:2px" id="cloud-status-text">Checking...</div>
+        <div style="font-size:13px;font-weight:700;color:var(--t)">Auto Sync</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px" id="cloud-status-text">Connecting...</div>
       </div>
       <div id="cloud-status-icon" style="font-size:28px">⏳</div>
     </div>
-    <div style="font-size:11px;color:var(--t2);margin-bottom:12px;padding:9px;background:var(--abg2);border-radius:8px;border:1px solid rgba(232,24,90,.2)">
-      All sales automatically sync to Firebase cloud. Open this app on any device and see the same data.
+    <div style="font-size:11px;color:var(--t2);margin-top:10px;padding:9px;background:var(--abg2);border-radius:8px;border:1px solid rgba(232,24,90,.2)">
+      Every sale saves to Firebase instantly. If offline, sales are stored locally and automatically uploaded the moment internet returns — nothing is lost.
     </div>
-    <button class="btn btn-ghost" style="margin-bottom:8px" onclick="manualSync()">🔄 Sync Now from Cloud</button>
-    <button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:8px" onclick="migrateLocalToCloud()">☁️ Upload Local Sales → Firebase</button>
   </div>
 
   <div class="sec">🎨 App Theme</div>
@@ -585,14 +660,149 @@ select.native{background:var(--s2);border:1.5px solid var(--b);border-radius:var
         <span style="font-size:18px">☀️</span>
       </div>
     </div>
-    <!-- Colour palette -->
     <div style="font-size:12px;color:var(--t2);margin-bottom:12px;font-weight:600">Choose accent colour:</div>
     <div id="theme-swatches" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
   </div>
+</div>
 
-  <div class="sec">Data</div>
-  <div class="card">
-    <button class="btn btn-red" onclick="clearHistory()">🗑 Clear All Sales History</button>
+<!-- EDIT BILL MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal" style="max-height:96vh">
+    <div class="modal-handle"></div>
+    <div style="font-size:15px;font-weight:800;color:var(--a);margin-bottom:14px">✏️ Edit / Update Bill</div>
+
+    <!-- Edit items -->
+    <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Items</div>
+    <div id="edit-items-container"></div>
+
+    <!-- Cancel items -->
+    <div style="margin-top:12px;padding:10px;background:var(--rbg);border:1px solid var(--rbr);border-radius:var(--rad)">
+      <div style="font-size:11px;font-weight:700;color:var(--r);margin-bottom:6px">CANCEL / REMOVE ITEMS</div>
+      <div id="edit-cancel-items"></div>
+    </div>
+
+    <!-- Edit amounts -->
+    <div style="margin-top:12px">
+      <label style="color:var(--t2)">Discount Amount (₹)</label>
+      <input type="number" id="edit-discount" placeholder="0" style="margin-bottom:8px">
+      <label style="color:var(--t2)">Final Amount Paid (₹)</label>
+      <input type="number" id="edit-final" placeholder="0">
+    </div>
+
+    <!-- Edit note -->
+    <div style="margin-top:8px">
+      <label style="color:var(--t2)">Reason for Edit</label>
+      <textarea id="edit-reason" placeholder="e.g. Customer returned one item, price correction..." style="min-height:60px"></textarea>
+    </div>
+
+    <!-- Save -->
+    <button class="btn btn-primary" style="margin-top:14px" onclick="saveBillEdit()">✓ Save Changes & Notify Owner</button>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="closeModal('edit-modal')">Cancel</button>
+  </div>
+</div>
+
+<!-- CLEAR HISTORY CONFIRM MODAL -->
+<div class="modal-overlay" id="clear-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="text-align:center;padding:10px 0">
+      <div style="font-size:36px;margin-bottom:12px">⚠️</div>
+      <div style="font-size:16px;font-weight:800;color:var(--r);margin-bottom:8px">Clear All History?</div>
+      <div style="font-size:13px;color:var(--t2);margin-bottom:20px">This will permanently delete ALL sales from this device AND Firebase cloud. This cannot be undone.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn btn-ghost" onclick="closeModal('clear-modal')">Cancel</button>
+        <button class="btn btn-red" onclick="executeClearHistory()">Yes, Delete All</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RETURN / EXCHANGE MODAL -->
+<div class="modal-overlay" id="return-modal">
+  <div class="modal" style="max-height:96vh;overflow-y:auto">
+    <div class="modal-handle"></div>
+    <div style="font-size:16px;font-weight:800;color:var(--o);margin-bottom:6px">🔄 Return / Exchange</div>
+    <div style="font-size:11px;color:var(--t3);margin-bottom:14px" id="re-bill-ref">Bill: —</div>
+
+    <!-- Type toggle -->
+    <div style="display:flex;gap:0;background:var(--s3);border-radius:9px;padding:3px;margin-bottom:14px">
+      <button class="re-type-tab active" id="re-tab-return" onclick="setReType('return')"
+        style="flex:1;padding:9px;border-radius:7px;border:none;background:var(--o);color:#fff;font-size:13px;font-weight:700;cursor:pointer">
+        ↩ Return
+      </button>
+      <button class="re-type-tab" id="re-tab-exchange" onclick="setReType('exchange')"
+        style="flex:1;padding:9px;border-radius:7px;border:none;background:none;color:var(--t2);font-size:13px;font-weight:600;cursor:pointer">
+        🔀 Exchange
+      </button>
+    </div>
+
+    <!-- ITEMS TO RETURN / EXCHANGE -->
+    <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">
+      Select items customer is returning:
+    </div>
+    <div id="re-items-list"></div>
+
+    <!-- RETURN SECTION -->
+    <div id="re-return-section">
+      <div style="margin-top:14px;padding:12px;background:var(--obg);border:1px solid var(--obr);border-radius:var(--rad)">
+        <div style="font-size:12px;font-weight:700;color:var(--o);margin-bottom:10px">REFUND DETAILS</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:13px;color:var(--t2)">Return value</span>
+          <span style="font-size:16px;font-weight:800;color:var(--o)" id="re-return-value">₹0</span>
+        </div>
+        <label>Refund Method</label>
+        <select id="re-refund-method" style="width:100%;background:var(--s2);border:1.5px solid var(--b);border-radius:var(--rad);padding:9px 12px;color:var(--t);font-size:13px;outline:none;margin-bottom:8px"></select>
+        <label>Condition of returned item</label>
+        <select id="re-condition" style="width:100%;background:var(--s2);border:1.5px solid var(--b);border-radius:var(--rad);padding:9px 12px;color:var(--t);font-size:13px;outline:none">
+          <option value="good">Good — full refund</option>
+          <option value="partial">Used / damaged — partial refund</option>
+          <option value="store-credit">Store credit only</option>
+        </select>
+        <div id="re-partial-section" style="display:none;margin-top:8px">
+          <label>Actual Refund Amount (₹)</label>
+          <input type="number" id="re-partial-amt" placeholder="0" style="font-size:16px;font-weight:700;color:var(--o);text-align:right">
+        </div>
+      </div>
+    </div>
+
+    <!-- EXCHANGE SECTION -->
+    <div id="re-exchange-section" style="display:none">
+      <div style="margin-top:14px;padding:12px;background:var(--gbg);border:1px solid var(--gbr);border-radius:var(--rad)">
+        <div style="font-size:12px;font-weight:700;color:var(--g);margin-bottom:10px">NEW ITEM(S) GIVEN</div>
+
+        <div id="re-new-items-container"></div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="addExchangeItem()">+ Add New Item</button>
+
+        <div style="height:1px;background:var(--gbr);margin:12px 0"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:12px;color:var(--t2)">Return value</span>
+          <span style="font-size:14px;font-weight:700;color:var(--r)" id="re-exch-return-val">-₹0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:12px;color:var(--t2)">New items value</span>
+          <span style="font-size:14px;font-weight:700;color:var(--g)" id="re-exch-new-val">+₹0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--gbr)">
+          <span style="font-size:13px;font-weight:700;color:var(--t)">Difference</span>
+          <span style="font-size:16px;font-weight:800" id="re-exch-diff">₹0</span>
+        </div>
+        <div style="font-size:11px;color:var(--t3);margin-top:4px" id="re-exch-diff-note"></div>
+
+        <label style="margin-top:10px">Payment method for difference</label>
+        <select id="re-exch-method" style="width:100%;background:var(--s2);border:1.5px solid var(--b);border-radius:var(--rad);padding:9px 12px;color:var(--t);font-size:13px;outline:none"></select>
+      </div>
+    </div>
+
+    <!-- REASON -->
+    <div style="margin-top:12px">
+      <label>Reason for Return / Exchange</label>
+      <textarea id="re-reason" placeholder="e.g. Size issue, defective, customer changed mind..." style="min-height:60px"></textarea>
+    </div>
+
+    <button class="btn btn-primary" style="margin-top:14px;background:linear-gradient(135deg,var(--o),#c2440a)" onclick="saveReturnExchange()">
+      ✓ Process & Notify Owner
+    </button>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="closeModal('return-modal')">Cancel</button>
   </div>
 </div>
 
@@ -620,6 +830,8 @@ select.native{background:var(--s2);border:1.5px solid var(--b);border-radius:var
       <button class="btn btn-green" onclick="resendWA('owner')">📲 Resend Owner</button>
       <button class="btn btn-blue" id="resend-cust-btn" onclick="resendWA('customer')">💬 Resend Customer</button>
     </div>
+    <button class="btn btn-ghost" style="margin-top:8px;background:var(--abg);color:var(--a);border-color:var(--a)" onclick="openEditModal()">✏️ Edit / Update Bill</button>
+    <button class="btn btn-ghost" style="margin-top:8px;background:var(--obg);color:var(--o);border-color:var(--o)" onclick="openReturnExchangeModal()">🔄 Return / Exchange</button>
     <button class="btn btn-red" style="margin-top:8px" onclick="deleteSale()">🗑 Delete Sale</button>
     <button class="btn btn-ghost" style="margin-top:8px" onclick="closeModal('detail-modal')">Close</button>
   </div>
@@ -688,18 +900,146 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const COLL = 'sales';
-let syncState = 'idle'; // idle | syncing | ok | error
+let syncState = 'idle';
+let unsubscribeListener = null;
+let isOnline = navigator.onLine;
+
+// ── Enable offline persistence ────────────────────────
+// Firestore caches all data locally in IndexedDB.
+// Any write made offline is queued and auto-sent when network returns.
+db.enableIndexedDbPersistence({ synchronizeTabs: true })
+  .then(() => {
+    console.log('✅ Firestore offline persistence enabled — sales work without internet');
+  })
+  .catch(err => {
+    if (err.code === 'failed-precondition') {
+      // Multiple tabs open — persistence only works in one tab at a time
+      console.warn('Offline persistence unavailable: multiple tabs open');
+    } else if (err.code === 'unimplemented') {
+      // Browser doesn't support IndexedDB (very rare)
+      console.warn('Offline persistence not supported in this browser');
+    }
+  });
+
+// ── Network status monitoring ─────────────────────────
+window.addEventListener('online', () => {
+  isOnline = true;
+  flushPendingQueue(); // upload all queued offline sales now
+});
+window.addEventListener('offline', () => {
+  isOnline = false;
+  setSyncState('offline');
+  updatePendingBadge();
+});
+
+// ── Pending offline queue ─────────────────────────────
+// Stores sale IDs that were saved while offline
+function getPendingQueue() {
+  try { return JSON.parse(localStorage.getItem('spt_pending') || '[]'); } catch(e) { return []; }
+}
+function setPendingQueue(arr) {
+  try { localStorage.setItem('spt_pending', JSON.stringify(arr)); } catch(e) {}
+}
+function addToPendingQueue(saleId) {
+  const q = getPendingQueue();
+  if (!q.includes(saleId)) q.push(saleId);
+  setPendingQueue(q);
+  updatePendingBadge();
+}
+function removeFromPendingQueue(saleId) {
+  const q = getPendingQueue().filter(id => id !== saleId);
+  setPendingQueue(q);
+  updatePendingBadge();
+}
+function updatePendingBadge() {
+  const q = getPendingQueue();
+  const badge   = document.getElementById('sync-badge');
+  const icon    = document.getElementById('cloud-status-icon');
+  const txt     = document.getElementById('cloud-status-text');
+  const pendDiv = document.getElementById('pending-count-bar');
+
+  if (!isOnline) {
+    if (badge) badge.textContent = '📴';
+    if (icon)  icon.textContent  = '📴';
+    if (txt)   txt.textContent   = q.length > 0
+      ? `Offline — ${q.length} sale${q.length>1?'s':''} waiting to upload`
+      : 'Offline — no internet';
+    if (pendDiv) {
+      pendDiv.style.display = q.length > 0 ? '' : 'none';
+      pendDiv.innerHTML = `<span style="font-size:13px">📴</span>
+        <span style="font-size:12px;font-weight:700;flex:1">${q.length} sale${q.length>1?'s':''} pending upload</span>
+        <span style="font-size:11px;color:var(--t2)">Auto-uploads when online</span>`;
+    }
+  } else if (q.length > 0) {
+    if (badge) badge.textContent = '🔄';
+    if (icon)  icon.textContent  = '🔄';
+    if (txt)   txt.textContent   = `Uploading ${q.length} offline sale${q.length>1?'s':''}...`;
+    if (pendDiv) {
+      pendDiv.style.display = '';
+      pendDiv.innerHTML = `<span style="font-size:13px">🔄</span>
+        <span style="font-size:12px;font-weight:700;flex:1">Uploading ${q.length} offline sale${q.length>1?'s':''}...</span>`;
+    }
+  } else {
+    if (pendDiv) pendDiv.style.display = 'none';
+  }
+}
+
+async function flushPendingQueue() {
+  const q = getPendingQueue();
+  if (!q.length) {
+    setSyncState('live');
+    return;
+  }
+
+  setSyncState('saving', `Uploading ${q.length} offline sale${q.length>1?'s':''}...`);
+  updatePendingBadge();
+
+  let uploaded = 0;
+  for (const saleId of [...q]) {
+    const sale = sales.find(s => s.id === saleId);
+    if (!sale) { removeFromPendingQueue(saleId); continue; }
+    try {
+      await db.collection(COLL).doc(sale.id).set(saleToDoc(sale));
+      removeFromPendingQueue(saleId);
+      uploaded++;
+    } catch(e) {
+      console.error('Flush error for', saleId, e.message);
+    }
+  }
+
+  const remaining = getPendingQueue().length;
+  if (remaining === 0) {
+    setSyncState('live', `✅ ${uploaded} offline sale${uploaded>1?'s':''} uploaded successfully`);
+    showToast(`✅ ${uploaded} sale${uploaded>1?'s':''} synced to cloud`);
+  } else {
+    setSyncState('error', `${remaining} sale${remaining>1?'s':''} still pending — will retry`);
+  }
+  updatePendingBadge();
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+    background:var(--g);color:#fff;padding:10px 20px;border-radius:20px;
+    font-size:13px;font-weight:700;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4);
+    animation:fadeUp .3s ease;pointer-events:none;white-space:nowrap`;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
 
 function setSyncState(state, msg) {
   syncState = state;
-  const badge  = document.getElementById('sync-badge');
-  const icon   = document.getElementById('cloud-status-icon');
-  const txt    = document.getElementById('cloud-status-text');
+  const badge = document.getElementById('sync-badge');
+  const icon  = document.getElementById('cloud-status-icon');
+  const txt   = document.getElementById('cloud-status-text');
   const map = {
-    idle:    { b:'⏳', i:'⏳', t:'Connecting...' },
-    syncing: { b:'🔄', i:'🔄', t:'Syncing with Firebase...' },
-    ok:      { b:'☁️', i:'✅', t: msg || 'Synced — data is up to date' },
-    error:   { b:'❌', i:'❌', t: msg || 'Sync error — working offline' },
+    idle:    { b:'⏳', i:'⏳', t:'Connecting to cloud...' },
+    live:    { b:'🟢', i:'🟢', t: msg || 'Live — real-time sync active' },
+    saving:  { b:'🔄', i:'🔄', t: msg || 'Saving...' },
+    ok:      { b:'☁️', i:'✅', t: msg || 'Saved to cloud' },
+    offline: { b:'📴', i:'📴', t: msg || 'Offline — sales queued, auto-sync when online' },
+    error:   { b:'❌', i:'❌', t: msg || 'Error — stored locally' },
   };
   const m = map[state] || map.idle;
   if (badge) badge.textContent = m.b;
@@ -707,7 +1047,7 @@ function setSyncState(state, msg) {
   if (txt)   txt.textContent   = m.t;
 }
 
-// Convert sale object → flat Firestore doc (no nested undefined)
+// ── Firestore serialisation ──────────────────────────
 function saleToDoc(sale) {
   return {
     id:          sale.id,
@@ -716,19 +1056,20 @@ function saleToDoc(sale) {
     custName:    sale.custName    || '',
     custMobile:  sale.custMobile  || '',
     note:        sale.note        || '',
-    items:       JSON.stringify(sale.items || []),
+    items:       JSON.stringify(sale.items    || []),
     itemsTotal:  sale.itemsTotal  || 0,
     discountAmt: sale.discountAmt || 0,
     discountPct: sale.discountPct || 0,
     finalAmt:    sale.finalAmt    || 0,
     totalCost:   sale.totalCost   ?? null,
     profit:      sale.profit      ?? null,
-    payInfo:     JSON.stringify(sale.payInfo || {}),
+    payInfo:     JSON.stringify(sale.payInfo  || {}),
+    edited:      sale.edited      || false,
+    editHistory: JSON.stringify(sale.editHistory || []),
     savedAt:     firebase.firestore.FieldValue.serverTimestamp()
   };
 }
 
-// Convert Firestore doc → sale object
 function docToSale(d) {
   return {
     id:          d.id,
@@ -744,70 +1085,93 @@ function docToSale(d) {
     finalAmt:    d.finalAmt,
     totalCost:   d.totalCost,
     profit:      d.profit,
-    payInfo:     safeJSON(d.payInfo, {})
+    payInfo:     safeJSON(d.payInfo, {}),
+    edited:      d.edited || false,
+    editHistory: safeJSON(d.editHistory, [])
   };
 }
+
 function safeJSON(str, fallback) {
   try { return typeof str === 'string' ? JSON.parse(str) : (str || fallback); } catch(e) { return fallback; }
 }
 
-// Push one sale to Firebase
+// ── Write one sale (auto-called on every save) ────────
+// With persistence enabled, Firestore queues this write offline
+// and sends it automatically when network is restored.
 async function pushSaleToCloud(sale) {
-  setSyncState('syncing');
+  if (!isOnline) {
+    // Firestore will queue this write — no await needed, it works offline
+    db.collection(COLL).doc(sale.id).set(saleToDoc(sale))
+      .catch(e => console.warn('Queued write error (expected offline):', e.code));
+    setSyncState('offline', 'Offline — this sale is queued and will auto-upload when online');
+    return;
+  }
+  setSyncState('saving');
   try {
     await db.collection(COLL).doc(sale.id).set(saleToDoc(sale));
-    setSyncState('ok', `Saved — ${new Date().toLocaleTimeString('en-IN')}`);
+    setSyncState('live');
   } catch(e) {
-    setSyncState('error', 'Save failed — sale stored locally');
-    console.error('Firebase push error:', e.message);
+    setSyncState('error', 'Save failed — stored locally');
+    console.error('Firebase write error:', e.message);
   }
 }
 
-// Delete one sale from Firebase
+// ── Delete one sale ───────────────────────────────────
 async function deleteSaleFromCloud(id) {
-  try { await db.collection(COLL).doc(id).delete(); } catch(e) { console.error('Firebase delete error:', e.message); }
-}
-
-// Load all sales from Firebase (called on startup and on manual sync)
-async function loadSalesFromCloud() {
-  setSyncState('syncing');
   try {
-    const snap = await db.collection(COLL)
-      .orderBy('date', 'desc')
-      .limit(5000)
-      .get();
-
-    if (!snap.empty) {
-      sales = snap.docs.map(doc => docToSale(doc.data()));
-      saveSales(); // keep localStorage in sync as offline backup
-    }
-    setSyncState('ok', `${sales.length} sales loaded — ${new Date().toLocaleTimeString('en-IN')}`);
-    renderHistoryStats();
-    renderHistory();
+    await db.collection(COLL).doc(id).delete();
   } catch(e) {
-    setSyncState('error', 'Cloud load failed — showing local data');
-    console.error('Firebase load error:', e.message);
+    console.error('Firebase delete error:', e.message);
   }
 }
 
-// Manual sync button
-function manualSync() {
-  loadSalesFromCloud();
+// ── Real-time listener — fires automatically whenever
+//    ANY device adds / edits / deletes a sale ──────────
+function startRealtimeSync() {
+  if (unsubscribeListener) unsubscribeListener(); // detach any old listener
+  setSyncState('idle');
+
+  unsubscribeListener = db.collection(COLL)
+    .orderBy('date', 'desc')
+    .limit(5000)
+    .onSnapshot(
+      (snapshot) => {
+        // Build full sales array from snapshot
+        sales = snapshot.docs.map(doc => docToSale(doc.data()));
+        // Keep localStorage in sync as offline fallback
+        saveSales();
+        // Update UI
+        renderHistoryStats();
+        renderHistory();
+        const t = new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+        setSyncState('live', `Live sync · ${sales.length} sales · updated ${t}`);
+      },
+      (error) => {
+        console.error('Realtime listener error:', error.message);
+        if (!isOnline) {
+          setSyncState('offline', 'Offline — showing cached data, will sync when online');
+        } else {
+          setSyncState('error', 'Connection lost — showing local data');
+        }
+      }
+    );
 }
 
-// Migrate all localStorage sales to Firebase (one-time use)
-async function migrateLocalToCloud() {
-  const local = (() => { try { return JSON.parse(localStorage.getItem('spt6_sales') || '[]'); } catch(e) { return []; } })();
-  if (!local.length) { alert('No local sales found to migrate.'); return; }
-  if (!confirm(`Upload ${local.length} local sales to Firebase? This will not delete local data.`)) return;
-  setSyncState('syncing');
-  let count = 0;
-  for (const sale of local) {
-    try { await db.collection(COLL).doc(sale.id).set(saleToDoc(sale)); count++; } catch(e) { console.error('Migrate error:', e.message); }
-  }
-  setSyncState('ok', `${count}/${local.length} sales uploaded`);
-  alert(`Done! ${count} of ${local.length} sales uploaded to Firebase.`);
-  loadSalesFromCloud();
+// ── Clear all (batch delete from Firestore) ───────────
+function confirmClearHistory() { openModal('clear-modal'); }
+
+function executeClearHistory() {
+  closeModal('clear-modal');
+  // Firestore batch deletes (max 500 per batch)
+  const chunks = [];
+  for (let i = 0; i < sales.length; i += 499) chunks.push(sales.slice(i, i + 499));
+  chunks.forEach(chunk => {
+    const batch = db.batch();
+    chunk.forEach(s => batch.delete(db.collection(COLL).doc(s.id)));
+    batch.commit().catch(e => console.error('Batch delete error:', e.message));
+  });
+  sales = []; saveSales(); renderHistoryStats(); renderHistory();
+  // The onSnapshot listener will confirm deletion automatically
 }
 
 // ===================== INIT =====================
@@ -829,8 +1193,8 @@ function init() {
   renderCodeTable();
   renderPayMethodsSet();
   renderSalesmanFilter();
-  // Load from Firebase — updates UI automatically when done
-  loadSalesFromCloud();
+  // Start real-time Firebase listener — fully automatic from here
+  startRealtimeSync();
 }
 
 function updateNavBrand() {
@@ -1183,6 +1547,11 @@ function resetSale() {
   ['cust-name','cust-mobile','sale-note','paid-amount','disc-pct-val','disc-amt-val','due-paid-now','due-note','due-date'].forEach(id => { const el=document.getElementById(id); if(el)el.value=''; });
   document.getElementById('total-bar').style.display='none';
   document.getElementById('paid-adj-section').style.display='none';
+  // Clear customer panel
+  document.getElementById('cust-found-banner').style.display='none';
+  document.getElementById('cust-hist-panel').style.display='none';
+  document.getElementById('mobile-fetch-icon').textContent='';
+  fetchedCustomer=null;
   setPayMode('single'); setDiscType('none');
   addItem(); renderSingleMethods(); renderSplitRows(); renderDueMethodSelect();
 }
@@ -1405,22 +1774,28 @@ function renderHistory() {
           ? `<span class="pbadge ${s.profit>=0?'pos':'neg'}">🔒 ${s.profit>=0?'+':'-'}₹${Math.abs(s.profit).toLocaleString('en-IN')}</span>`
           : `<span class="pbadge na">No code</span>`;
 
-        html += `<div class="sale-card" onclick="viewSale('${s.id}')">
+        html += `<div class="sale-card ${s.edited?'edited':''} ${s.hasReturn?'returned':''} ${s.hasExchange?'exchanged':''}" onclick="viewSale('${s.id}')">
           <div class="sale-hdr">
             <div>
               <div class="sale-id">${s.id} · ${st}</div>
               <div style="font-size:13px;font-weight:700;margin-top:2px">${s.salesman}</div>
               ${s.custName?`<div style="font-size:11px;color:var(--t2)">${s.custName}</div>`:''}
               ${pm?`<div style="font-size:11px;color:var(--t3);margin-top:2px">${pm}</div>`:''}
+              <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
+                ${s.edited?`<span class="edited-badge">✏️ Edited${s.editHistory?.length>1?' ('+s.editHistory.length+'x)':''}</span>`:''}
+                ${s.hasReturn?`<span class="re-badge-return">↩ Returned</span>`:''}
+                ${s.hasExchange?`<span class="re-badge-exchange">🔀 Exchanged</span>`:''}
+              </div>
             </div>
             <div style="text-align:right">
-              <div class="sale-amt">₹${s.finalAmt.toLocaleString('en-IN')}</div>
+              <div class="sale-amt" style="${s.edited?'color:var(--o)':''}">₹${s.finalAmt.toLocaleString('en-IN')}</div>
               ${s.discountAmt>0?`<div style="font-size:11px;color:var(--r);margin-top:2px">-₹${s.discountAmt.toLocaleString('en-IN')} off</div>`:''}
               ${hasDue?`<div style="margin-top:3px"><span class="dbadge">⏳ Due ₹${s.payInfo.balanceDue.toLocaleString('en-IN')}</span></div>`:''}
+              ${s.hasReturn&&s.returnRefund>0?`<div style="font-size:11px;color:#8b5cf6;margin-top:2px">↩ Refund ₹${s.returnRefund.toLocaleString('en-IN')}</div>`:''}
               <div style="margin-top:4px">${profBadge}</div>
             </div>
           </div>
-          <div class="sale-items-list">📦 ${(s.items||[]).map(i=>i.product+(i.qty>1?` ×${i.qty}`:'')).join(', ')}</div>
+          <div class="sale-items-list">📦 ${(s.items||[]).map(i=>(i.cancelled?'<s style="color:var(--r)">':'')+i.product+(i.qty>1?` ×${i.qty}`:'')+`${i.cancelled?'</s> ❌':''}`).join(', ')}</div>
         </div>`;
       });
     }
@@ -1451,9 +1826,62 @@ function viewSale(id) {
     </div>`;
   }
 
+  // Show edit history log if bill was edited
+  if (sale.edited && sale.editHistory?.length) {
+    html += `<div style="margin-top:12px;padding:12px;background:var(--obg);border-radius:10px;border:1px solid var(--obr)">
+      <div style="font-size:10px;color:var(--o);margin-bottom:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px">✏️ Bill Edit History</div>`;
+    sale.editHistory.forEach((eh, i) => {
+      const edDate = new Date(eh.editedAt).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+      html += `<div style="padding:8px;background:var(--s2);border-radius:8px;margin-bottom:6px;border-left:3px solid var(--o)">
+        <div style="font-size:11px;color:var(--o);font-weight:700;margin-bottom:4px">Edit #${i+1} — ${edDate}</div>
+        ${eh.reason?`<div style="font-size:12px;color:var(--t2);margin-bottom:4px">📝 ${eh.reason}</div>`:''}
+        <div style="font-size:12px;display:flex;gap:12px;flex-wrap:wrap">
+          ${eh.changes.map(c=>`<span style="color:var(--o)">• ${c}</span>`).join('')}
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Show return/exchange history log
+  if (sale.returnExchangeLog?.length) {
+    sale.returnExchangeLog.forEach(log => {
+      const logDate = new Date(log.date).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+      const isReturn = log.type === 'return';
+      const color = isReturn ? '#8b5cf6' : '#06b6d4';
+      const bg = isReturn ? 'rgba(139,92,246,.12)' : 'rgba(6,182,212,.12)';
+      const border = isReturn ? 'rgba(139,92,246,.3)' : 'rgba(6,182,212,.3)';
+
+      html += `<div style="margin-top:12px;padding:12px;background:${bg};border-radius:10px;border:1px solid ${border}">
+        <div style="font-size:10px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">
+          ${isReturn ? '↩ Return' : '🔀 Exchange'} — ${logDate}
+        </div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:6px">By: ${log.by||'Staff'}</div>
+        ${log.reason?`<div style="font-size:12px;color:var(--t2);margin-bottom:8px">📝 ${log.reason}</div>`:''}
+        <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:4px">Returned Items:</div>
+        ${(log.returnedItems||[]).map(i=>`<div style="font-size:12px;color:${color};margin-bottom:2px">↩ ${i.product}${i.qty>1?' ×'+i.qty:''} — ₹${((i.price||0)*(i.qty||1)).toLocaleString('en-IN')}</div>`).join('')}
+        ${log.type==='exchange' && log.newItems?.length ? `
+          <div style="font-size:11px;font-weight:700;color:var(--t3);margin-top:8px;margin-bottom:4px">New Items Given:</div>
+          ${log.newItems.map(i=>`<div style="font-size:12px;color:var(--g);margin-bottom:2px">+ ${i.name} — ₹${i.price.toLocaleString('en-IN')}</div>`).join('')}
+          <div style="display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid ${border};font-size:13px;font-weight:700">
+            <span style="color:${color}">Difference</span>
+            <span style="color:${log.diff>=0?'var(--g)':'var(--o)'}">
+              ${log.diff>=0?'Customer pays ₹'+log.diff.toLocaleString('en-IN'):'Refund ₹'+Math.abs(log.diff).toLocaleString('en-IN')}
+            </span>
+          </div>` : ''}
+        ${log.type==='return' ? `
+          <div style="display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid ${border};font-size:14px;font-weight:800">
+            <span style="color:${color}">Refund</span>
+            <span style="color:${color}">₹${(log.refundAmt||0).toLocaleString('en-IN')} via ${log.refundMethod||'—'}</span>
+          </div>` : ''}
+      </div>`;
+    });
+  }
+
   document.getElementById('detail-content').innerHTML = html;
   document.getElementById('resend-cust-btn').style.opacity = sale.custMobile ? '1' : '0.4';
   openModal('detail-modal');
+}
 }
 
 function deleteSale() {
@@ -1537,17 +1965,6 @@ function removePayMethod(i) {
   S.payMethods.splice(i,1); saveS();
   renderPayMethodsSet(); renderSingleMethods(); renderSplitRows(); renderDueMethodSelect();
 }
-function clearHistory() {
-  if(!confirm('Delete ALL sales from device AND Firebase cloud?\nThis CANNOT be undone.'))return;
-  // Batch delete from Firebase (max 500 per batch, fine for typical shop use)
-  const batch = db.batch();
-  sales.forEach(s => batch.delete(db.collection(COLL).doc(s.id)));
-  batch.commit()
-    .then(()=>setSyncState('ok','All sales cleared from cloud'))
-    .catch(e=>{ setSyncState('error','Cloud delete failed — clear locally only'); console.error(e); });
-  sales=[]; saveSales(); renderHistoryStats(); renderHistory();
-}
-
 // ===================== MODAL =====================
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -1698,6 +2115,607 @@ function loadTheme() {
     if (savedDark !== null) isDarkMode = savedDark === '1';
   } catch(e) {}
   applyTheme(null, isDarkMode);
+}
+
+// ===================== CUSTOMER AUTO-FETCH + HISTORY PANEL =====================
+let fetchedCustomer = null;
+let mobileDebounceTimer = null;
+
+function onMobileInput(val) {
+  clearTimeout(mobileDebounceTimer);
+  // Hide panels while typing
+  document.getElementById('cust-found-banner').style.display = 'none';
+  document.getElementById('cust-hist-panel').style.display = 'none';
+  fetchedCustomer = null;
+  const icon = document.getElementById('mobile-fetch-icon');
+  if (val.length < 10) { icon.textContent = ''; return; }
+  icon.textContent = '⏳';
+  mobileDebounceTimer = setTimeout(() => fetchCustomerByMobile(val), 600);
+}
+
+async function fetchCustomerByMobile(mobile) {
+  const icon = document.getElementById('mobile-fetch-icon');
+  try {
+    // Search locally first (instant)
+    let custSales = sales.filter(s => s.custMobile === mobile)
+                         .sort((a,b) => new Date(b.date)-new Date(a.date));
+
+    // Also search Firebase if local is empty (data from other devices)
+    if (!custSales.length) {
+      const snap = await db.collection(COLL)
+        .where('custMobile','==',mobile)
+        .orderBy('date','desc')
+        .limit(20)
+        .get();
+      if (!snap.empty) {
+        custSales = snap.docs.map(d => docToSale(d.data()));
+      }
+    }
+
+    if (!custSales.length) {
+      icon.textContent = '';
+      return; // New customer — no history
+    }
+
+    // Get customer name from most recent sale with a name
+    const withName = custSales.find(s => s.custName);
+    const custName = withName?.custName || '';
+    const totalSpent = custSales.reduce((a,s) => a + s.finalAmt, 0);
+    const lastVisit  = new Date(custSales[0].date)
+                          .toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+
+    fetchedCustomer = { name: custName, mobile, visits: custSales.length, totalSpent };
+
+    // Auto-fill name
+    if (custName) document.getElementById('cust-name').value = custName;
+
+    // Show found banner
+    const banner = document.getElementById('cust-found-banner');
+    document.getElementById('cfb-name').textContent = custName || 'Returning Customer';
+    document.getElementById('cfb-stats').textContent =
+      `${custSales.length} visit${custSales.length>1?'s':''} · Last: ${lastVisit} · Total spent ₹${totalSpent.toLocaleString('en-IN')}`;
+    banner.style.display = 'flex';
+
+    // Render bill history panel
+    renderCustHistPanel(custSales);
+    icon.textContent = '✅';
+
+  } catch(e) {
+    icon.textContent = '';
+    console.error('Customer fetch error:', e.message);
+  }
+}
+
+function renderCustHistPanel(custSales) {
+  const panel   = document.getElementById('cust-hist-panel');
+  const label   = document.getElementById('cust-hist-label');
+  const summary = document.getElementById('cust-hist-summary');
+  const list    = document.getElementById('cust-hist-bills');
+
+  label.textContent = `Previous Bills (${custSales.length})`;
+
+  // Summary chips — no profit shown to staff
+  const totalSpent = custSales.reduce((a,s)=>a+s.finalAmt,0);
+  const totalDisc  = custSales.reduce((a,s)=>a+(s.discountAmt||0),0);
+  summary.innerHTML = `
+    <div style="background:var(--abg);border:1px solid var(--b2);border-radius:8px;padding:6px 10px;text-align:center;flex:1">
+      <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px">Total Spent</div>
+      <div style="font-size:15px;font-weight:800;color:var(--a)">₹${totalSpent.toLocaleString('en-IN')}</div>
+    </div>
+    <div style="background:var(--s3);border:1px solid var(--b2);border-radius:8px;padding:6px 10px;text-align:center;flex:1">
+      <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px">Visits</div>
+      <div style="font-size:15px;font-weight:800;color:var(--t)">${custSales.length}</div>
+    </div>
+    ${totalDisc>0?`<div style="background:var(--rbg);border:1px solid var(--rbr);border-radius:8px;padding:6px 10px;text-align:center;flex:1">
+      <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px">Disc Given</div>
+      <div style="font-size:15px;font-weight:800;color:var(--r)">₹${totalDisc.toLocaleString('en-IN')}</div>
+    </div>`:''}`;
+
+  // Bill cards — only show last 10
+  const recent = custSales.slice(0, 10);
+  list.innerHTML = recent.map(s => {
+    const d  = new Date(s.date);
+    const ds = d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+    const ts = d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    const itemNames = (s.items||[])
+      .filter(i=>!i.cancelled)
+      .map(i=>i.product+(i.qty>1?` ×${i.qty}`:'')).join(', ');
+    const hasDue = s.payInfo?.mode==='due' && (s.payInfo.balanceDue||0)>0;
+    const badges = [
+      s.edited    ? `<span style="font-size:10px;color:var(--o);background:var(--obg);padding:2px 6px;border-radius:8px;border:1px solid var(--obr)">✏️ Edited</span>` : '',
+      s.hasReturn ? `<span style="font-size:10px;color:#8b5cf6;background:rgba(139,92,246,.12);padding:2px 6px;border-radius:8px;border:1px solid rgba(139,92,246,.3)">↩ Returned</span>` : '',
+      s.hasExchange?`<span style="font-size:10px;color:#06b6d4;background:rgba(6,182,212,.12);padding:2px 6px;border-radius:8px;border:1px solid rgba(6,182,212,.3)">🔀 Exchanged</span>` : '',
+      hasDue      ? `<span style="font-size:10px;color:var(--o);background:var(--obg);padding:2px 6px;border-radius:8px;border:1px solid var(--obr)">⏳ Due ₹${s.payInfo.balanceDue.toLocaleString('en-IN')}</span>` : '',
+    ].filter(Boolean).join(' ');
+
+    return `<div class="cust-bill-row selectable" onclick="custBillAction_toggle('${s.id}')">
+      <div class="cust-bill-meta">
+        <div>
+          <div class="cust-bill-date">${ds} · ${ts}</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:1px">by ${s.salesman||'—'}</div>
+        </div>
+        <div class="cust-bill-amt">₹${s.finalAmt.toLocaleString('en-IN')}</div>
+      </div>
+      ${itemNames?`<div class="cust-bill-items">📦 ${itemNames}</div>`:''}
+      ${badges?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">${badges}</div>`:''}
+      <!-- Action buttons — staff only sees what they need, no profit -->
+      <div class="cust-bill-actions" id="cust-actions-${s.id}" style="display:none">
+        <button class="cust-action-btn" style="background:var(--abg);color:var(--a);border:1px solid var(--a)"
+          onclick="event.stopPropagation();custBillView('${s.id}')">👁 View Bill</button>
+        <button class="cust-action-btn" style="background:var(--obg);color:var(--o);border:1px solid var(--obr)"
+          onclick="event.stopPropagation();custBillEdit('${s.id}')">✏️ Edit</button>
+        <button class="cust-action-btn" style="background:rgba(139,92,246,.12);color:#8b5cf6;border:1px solid rgba(139,92,246,.3)"
+          onclick="event.stopPropagation();custBillReturn('${s.id}')">🔄 Return/Exchange</button>
+        ${hasDue?`<button class="cust-action-btn" style="background:var(--gbg);color:var(--g);border:1px solid var(--gbr)"
+          onclick="event.stopPropagation();custMarkDuePaid('${s.id}')">✓ Mark Due Paid</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  panel.style.display = '';
+}
+
+// Toggle action buttons row on tap
+function custBillAction_toggle(saleId) {
+  const el = document.getElementById('cust-actions-'+saleId);
+  if (!el) return;
+  const isOpen = el.style.display !== 'none';
+  // Close all other open action rows
+  document.querySelectorAll('[id^="cust-actions-"]').forEach(e => e.style.display='none');
+  if (!isOpen) el.style.display = 'flex';
+}
+
+// View full bill (opens detail modal — but staff cannot see profit section)
+function custBillView(saleId) {
+  viewingSaleId = saleId;
+  const sale = sales.find(s=>s.id===saleId); if(!sale) return;
+  currentBillSale = sale;
+  // Build bill HTML WITHOUT profit section (staff view)
+  let html = buildBillHTML(sale);
+  // Show return/exchange log if any
+  if (sale.returnExchangeLog?.length) {
+    sale.returnExchangeLog.forEach(log => {
+      const logDate = new Date(log.date).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+      const color = log.type==='return' ? '#8b5cf6' : '#06b6d4';
+      const bg    = log.type==='return' ? 'rgba(139,92,246,.1)' : 'rgba(6,182,212,.1)';
+      html += `<div style="margin-top:10px;padding:10px;background:${bg};border-radius:9px;border:1px solid ${color}40">
+        <div style="font-size:11px;font-weight:700;color:${color}">${log.type==='return'?'↩ Return':'🔀 Exchange'} · ${logDate}</div>
+        <div style="font-size:12px;color:var(--t2);margin-top:4px">📝 ${log.reason}</div>
+        ${log.type==='return'?`<div style="font-size:13px;font-weight:700;color:${color};margin-top:4px">Refund: ₹${(log.refundAmt||0).toLocaleString('en-IN')} via ${log.refundMethod||'—'}</div>`:''}
+      </div>`;
+    });
+  }
+  document.getElementById('detail-content').innerHTML = html;
+  document.getElementById('resend-cust-btn').style.opacity = sale.custMobile ? '1' : '0.4';
+  openModal('detail-modal');
+}
+
+// Open edit modal for this bill from customer history
+function custBillEdit(saleId) {
+  viewingSaleId = saleId;
+  const sale = sales.find(s=>s.id===saleId); if(!sale) return;
+  currentBillSale = sale;
+  openEditModal();
+}
+
+// Open return/exchange modal for this bill from customer history
+function custBillReturn(saleId) {
+  viewingSaleId = saleId;
+  const sale = sales.find(s=>s.id===saleId); if(!sale) return;
+  currentBillSale = sale;
+  openReturnExchangeModal();
+}
+
+// Mark balance due as paid
+async function custMarkDuePaid(saleId) {
+  const sale = sales.find(s=>s.id===saleId); if(!sale) return;
+  if (!sale.payInfo?.balanceDue) return;
+  const method = prompt(`Payment method for ₹${sale.payInfo.balanceDue.toLocaleString('en-IN')} due?\n(Cash / UPI / Card etc.)`, 'Cash');
+  if (!method) return;
+  const updated = {
+    ...sale,
+    finalAmt: sale.finalAmt + sale.payInfo.balanceDue,
+    payInfo: {
+      ...sale.payInfo,
+      balancePaidAt: new Date().toISOString(),
+      balancePaidMethod: method,
+      balanceDue: 0,
+      balancePaidNote: `Due of ₹${sale.payInfo.balanceDue} paid via ${method}`
+    },
+    edited: true,
+    editHistory: [...(sale.editHistory||[]), {
+      editedAt: new Date().toISOString(),
+      editedBy: selSalesman||'Staff',
+      reason: `Balance due paid via ${method}`,
+      changes: [`Balance due ₹${sale.payInfo.balanceDue.toLocaleString('en-IN')} marked as paid via ${method}`]
+    }]
+  };
+  const idx = sales.findIndex(s=>s.id===saleId);
+  if (idx>=0) sales[idx]=updated;
+  saveSales();
+  await pushSaleToCloud(updated);
+
+  // Notify owner
+  if (S.ownerMobile) {
+    const msg = `✅ *BALANCE PAID — ${S.shopName}*\nBill: ${sale.id}\n`
+      + `Customer: ${sale.custName||'—'} ${sale.custMobile||''}\n`
+      + `Amount paid: ₹${(sale.payInfo?.balanceDue||0).toLocaleString('en-IN')} via ${method}\n`
+      + `By: ${selSalesman||'Staff'}`;
+    window.open(`https://wa.me/${S.ownerMobile}?text=${encodeURIComponent(msg)}`,'_blank');
+  }
+
+  // Refresh the customer panel
+  onMobileInput(document.getElementById('cust-mobile').value);
+  renderHistoryStats();
+  renderHistory();
+}
+
+function useFetchedCustomer() {
+  if (!fetchedCustomer?.name) return;
+  document.getElementById('cust-name').value = fetchedCustomer.name;
+}
+
+// ===================== EDIT BILL =====================
+let editCancelledItems = new Set();
+
+function openEditModal() {
+  const sale = sales.find(s=>s.id===viewingSaleId); if(!sale) return;
+  editCancelledItems = new Set();
+
+  const editItemsHTML = (sale.items||[]).map((item,i) => {
+    const isCancelled = item.cancelled;
+    return `<div class="edit-item-row" style="${isCancelled?'opacity:.4':''}">
+      <div class="edit-item-name">${item.product}${item.qty>1?' ×'+item.qty:''}</div>
+      ${isCancelled
+        ? `<span style="color:var(--r);font-size:11px;font-weight:700">CANCELLED</span>`
+        : `<input type="number" class="edit-item-price" value="${(item.price||0)*(item.qty||1)}" id="edit-price-${i}"
+            style="width:90px;background:var(--s3);border:1px solid var(--b2);border-radius:7px;padding:6px 8px;color:var(--t);font-size:14px;font-weight:700;text-align:right;outline:none">`
+      }
+    </div>`;
+  }).join('');
+
+  const cancelItemsHTML = (sale.items||[]).map((item,i) => item.cancelled ? '' : `
+    <div class="cancel-item-row" onclick="toggleCancelItem(${i},this)" id="cancel-row-${i}" style="cursor:pointer">
+      <div class="cancel-item-check" id="cancel-chk-${i}"></div>
+      <span class="cancel-item-name">${item.product}${item.qty>1?' ×'+item.qty:''} — ₹${((item.price||0)*(item.qty||1)).toLocaleString('en-IN')}</span>
+    </div>`).join('');
+
+  document.getElementById('edit-items-container').innerHTML = editItemsHTML||'<div style="color:var(--t3);font-size:12px">No items</div>';
+  document.getElementById('edit-cancel-items').innerHTML = cancelItemsHTML||'<div style="color:var(--t3);font-size:12px">No active items</div>';
+  document.getElementById('edit-discount').value = sale.discountAmt||0;
+  document.getElementById('edit-final').value = sale.finalAmt||0;
+  document.getElementById('edit-reason').value = '';
+  closeModal('detail-modal');
+  openModal('edit-modal');
+}
+
+function toggleCancelItem(idx, row) {
+  const chk = document.getElementById('cancel-chk-'+idx);
+  if (editCancelledItems.has(idx)) {
+    editCancelledItems.delete(idx);
+    chk.style.cssText='background:transparent;border-radius:4px';chk.textContent='';
+    row.style.background='var(--rbg)';
+  } else {
+    editCancelledItems.add(idx);
+    chk.style.cssText='background:var(--r);color:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700';chk.textContent='✕';
+    row.style.background='rgba(220,38,38,.25)';
+  }
+}
+
+async function saveBillEdit() {
+  const sale = sales.find(s=>s.id===viewingSaleId); if(!sale) return;
+  const reason = document.getElementById('edit-reason').value.trim();
+  if (!reason) { alert('Please enter a reason for the edit.'); return; }
+
+  const changes = [];
+  const updatedItems = (sale.items||[]).map((item,i) => {
+    if (editCancelledItems.has(i)) {
+      changes.push(`${item.product} — CANCELLED`);
+      return {...item, cancelled:true, price:0};
+    }
+    const inp = document.getElementById('edit-price-'+i);
+    if (!inp) return item;
+    const newTotal = parseFloat(inp.value)||0;
+    const oldTotal = (item.price||0)*(item.qty||1);
+    if (Math.abs(newTotal-oldTotal)>=1) {
+      const newUnit = item.qty>1 ? newTotal/item.qty : newTotal;
+      changes.push(`${item.product}: ₹${oldTotal.toLocaleString('en-IN')} → ₹${newTotal.toLocaleString('en-IN')}`);
+      return {...item, price:newUnit};
+    }
+    return item;
+  });
+
+  const newDisc = parseFloat(document.getElementById('edit-discount').value)||0;
+  const newFinal = parseFloat(document.getElementById('edit-final').value)||0;
+  if (Math.abs(newDisc-(sale.discountAmt||0))>=1) changes.push(`Discount: ₹${sale.discountAmt||0} → ₹${newDisc}`);
+  if (Math.abs(newFinal-sale.finalAmt)>=1) changes.push(`Final Amount: ₹${sale.finalAmt.toLocaleString('en-IN')} → ₹${newFinal.toLocaleString('en-IN')}`);
+  if (!changes.length) { alert('No changes detected.'); return; }
+
+  const activeItems = updatedItems.filter(i=>!i.cancelled);
+  const newItemsTotal = activeItems.reduce((a,i)=>a+(i.price||0)*(i.qty||1),0);
+  const editEntry = { editedAt:new Date().toISOString(), editedBy:selSalesman||'Staff', reason, changes };
+  const updated = {
+    ...sale, items:updatedItems, itemsTotal:newItemsTotal,
+    discountAmt:newDisc, finalAmt:newFinal,
+    edited:true, editHistory:[...(sale.editHistory||[]), editEntry]
+  };
+
+  const idx = sales.findIndex(s=>s.id===viewingSaleId);
+  if (idx>=0) sales[idx]=updated;
+  saveSales();
+  await pushSaleToCloud(updated);
+
+  // WhatsApp notification to owner
+  if (S.ownerMobile) {
+    const d = new Date(editEntry.editedAt).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    let msg = `⚠️ *BILL UPDATED — ${S.shopName}*\nBill: ${sale.id} · ${d}\nUpdated by: ${editEntry.editedBy}\nReason: ${editEntry.reason}\n\n*Changes:*\n`;
+    editEntry.changes.forEach(c=>{msg+=`  • ${c}\n`;});
+    msg += `\n*New Amount: ₹${updated.finalAmt.toLocaleString('en-IN')}*\nCustomer: ${sale.custName||'—'} ${sale.custMobile||''}`;
+    window.open(`https://wa.me/${S.ownerMobile}?text=${encodeURIComponent(msg)}`,'_blank');
+  }
+
+  closeModal('edit-modal');
+  renderHistoryStats(); renderHistory();
+  setTimeout(()=>viewSale(viewingSaleId),400);
+}
+
+// ===================== RETURN / EXCHANGE =====================
+let reType = 'return';           // 'return' | 'exchange'
+let reSelectedItems = new Set(); // indexes of items being returned
+let reNewItems = [];             // new items for exchange [{name,price}]
+let reNewItemCtr = 0;
+
+function openReturnExchangeModal() {
+  const sale = sales.find(s=>s.id===viewingSaleId); if(!sale) return;
+  reType = 'return';
+  reSelectedItems = new Set();
+  reNewItems = [];
+  reNewItemCtr = 0;
+
+  document.getElementById('re-bill-ref').textContent = `Bill: ${sale.id} · ${sale.custName||'Customer'}`;
+  document.getElementById('re-reason').value = '';
+
+  // Populate payment method selects
+  const opts = S.payMethods.map(m=>`<option value="${m}">${m}</option>`).join('');
+  document.getElementById('re-refund-method').innerHTML = opts;
+  document.getElementById('re-exch-method').innerHTML = opts;
+
+  renderReItems(sale);
+  setReType('return');
+  updateReCalc(sale);
+
+  // Condition change listener
+  document.getElementById('re-condition').onchange = function() {
+    document.getElementById('re-partial-section').style.display =
+      (this.value === 'partial') ? '' : 'none';
+    updateReCalc(sale);
+  };
+
+  closeModal('detail-modal');
+  openModal('return-modal');
+}
+
+function setReType(type) {
+  reType = type;
+  const rTab = document.getElementById('re-tab-return');
+  const eTab = document.getElementById('re-tab-exchange');
+  const rSec = document.getElementById('re-return-section');
+  const eSec = document.getElementById('re-exchange-section');
+
+  if (type === 'return') {
+    rTab.style.background = 'var(--o)'; rTab.style.color = '#fff';
+    eTab.style.background = 'none';     eTab.style.color = 'var(--t2)';
+    rSec.style.display = ''; eSec.style.display = 'none';
+  } else {
+    eTab.style.background = '#06b6d4'; eTab.style.color = '#fff';
+    rTab.style.background = 'none';    rTab.style.color = 'var(--t2)';
+    eSec.style.display = ''; rSec.style.display = 'none';
+    renderExchangeNewItems();
+  }
+
+  const sale = sales.find(s=>s.id===viewingSaleId);
+  if (sale) updateReCalc(sale);
+}
+
+function renderReItems(sale) {
+  const activeItems = (sale.items||[]).filter(i => !i.cancelled);
+  document.getElementById('re-items-list').innerHTML = activeItems.length
+    ? activeItems.map((item,i) => `
+        <div class="re-item-row ${reSelectedItems.has(i)?'selected':''}" onclick="toggleReItem(${i})" id="re-item-${i}">
+          <div class="re-item-chk" id="re-chk-${i}">${reSelectedItems.has(i)?'✓':''}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:var(--t)">${item.product}${item.qty>1?' ×'+item.qty:''}</div>
+            <div style="font-size:12px;color:var(--t2)">₹${((item.price||0)*(item.qty||1)).toLocaleString('en-IN')}</div>
+          </div>
+        </div>`).join('')
+    : '<div style="color:var(--t3);font-size:12px">No active items to return</div>';
+}
+
+function toggleReItem(idx) {
+  const sale = sales.find(s=>s.id===viewingSaleId); if(!sale) return;
+  const row = document.getElementById('re-item-'+idx);
+  const chk = document.getElementById('re-chk-'+idx);
+  if (reSelectedItems.has(idx)) {
+    reSelectedItems.delete(idx);
+    row.classList.remove('selected');
+    chk.textContent = '';
+  } else {
+    reSelectedItems.add(idx);
+    row.classList.add('selected');
+    chk.textContent = '✓';
+  }
+  updateReCalc(sale);
+}
+
+function getReturnValue(sale) {
+  const activeItems = (sale.items||[]).filter(i=>!i.cancelled);
+  let total = 0;
+  reSelectedItems.forEach(idx => {
+    const item = activeItems[idx];
+    if (item) total += (item.price||0)*(item.qty||1);
+  });
+  return total;
+}
+
+function updateReCalc(sale) {
+  const returnVal = getReturnValue(sale);
+
+  // Return section
+  const rvEl = document.getElementById('re-return-value');
+  if (rvEl) rvEl.textContent = '₹'+returnVal.toLocaleString('en-IN');
+
+  // Exchange section
+  const newTotal = reNewItems.reduce((a,i)=>a+(parseFloat(i.price)||0),0);
+  const diff = newTotal - returnVal;
+
+  const ervEl = document.getElementById('re-exch-return-val');
+  const envEl = document.getElementById('re-exch-new-val');
+  const diffEl = document.getElementById('re-exch-diff');
+  const noteEl = document.getElementById('re-exch-diff-note');
+
+  if (ervEl) ervEl.textContent = '-₹'+returnVal.toLocaleString('en-IN');
+  if (envEl) envEl.textContent = '+₹'+newTotal.toLocaleString('en-IN');
+  if (diffEl) {
+    diffEl.textContent = '₹'+Math.abs(diff).toLocaleString('en-IN');
+    diffEl.style.color = diff > 0 ? 'var(--g)' : diff < 0 ? 'var(--o)' : 'var(--t)';
+  }
+  if (noteEl) {
+    noteEl.textContent = diff > 0
+      ? `Customer pays ₹${diff.toLocaleString('en-IN')} extra`
+      : diff < 0
+      ? `Refund ₹${Math.abs(diff).toLocaleString('en-IN')} to customer`
+      : 'No money exchange needed';
+    noteEl.style.color = diff > 0 ? 'var(--g)' : diff < 0 ? 'var(--o)' : 'var(--t3)';
+  }
+}
+
+function addExchangeItem() {
+  reNewItemCtr++;
+  reNewItems.push({id:'ni'+reNewItemCtr, name:'', price:0});
+  renderExchangeNewItems();
+}
+
+function renderExchangeNewItems() {
+  const sale = sales.find(s=>s.id===viewingSaleId);
+  document.getElementById('re-new-items-container').innerHTML = reNewItems.length
+    ? reNewItems.map((item,i) => `
+        <div class="re-new-item-row">
+          <input type="text" class="re-new-item-name" placeholder="Item name"
+            value="${item.name}" oninput="reNewItems[${i}].name=this.value"
+            style="flex:1;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:8px 10px;color:var(--t);font-size:13px;outline:none">
+          <input type="number" class="re-new-item-price" placeholder="₹"
+            value="${item.price||''}" oninput="reNewItems[${i}].price=+this.value;updateReCalc(sales.find(s=>s.id===viewingSaleId))"
+            style="width:90px;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:8px;color:var(--a);font-size:14px;font-weight:700;text-align:right;outline:none">
+          <button onclick="reNewItems.splice(${i},1);renderExchangeNewItems()" 
+            style="background:var(--rbg);color:var(--r);border:none;border-radius:7px;padding:6px 10px;cursor:pointer;font-size:12px;font-weight:700">✕</button>
+        </div>`).join('')
+    : '<div style="color:var(--t3);font-size:12px;margin-bottom:6px">No new items added yet</div>';
+  if (sale) updateReCalc(sale);
+}
+
+async function saveReturnExchange() {
+  const sale = sales.find(s=>s.id===viewingSaleId); if(!sale) return;
+  const reason = document.getElementById('re-reason').value.trim();
+  if (!reason) { alert('Please enter a reason for the return/exchange.'); return; }
+  if (reSelectedItems.size === 0) { alert('Please select at least one item being returned.'); return; }
+  if (reType === 'exchange' && reNewItems.length === 0) { alert('Please add at least one new item for exchange.'); return; }
+
+  const activeItems = (sale.items||[]).filter(i=>!i.cancelled);
+  const returnedItems = [...reSelectedItems].map(idx => activeItems[idx]).filter(Boolean);
+  const returnVal = getReturnValue(sale);
+
+  let logEntry = {
+    type: reType,
+    date: new Date().toISOString(),
+    by: selSalesman || 'Staff',
+    reason,
+    returnedItems: returnedItems.map(i => ({product:i.product, qty:i.qty||1, price:i.price||0})),
+  };
+
+  let waMsg = '';
+
+  if (reType === 'return') {
+    const condition = document.getElementById('re-condition').value;
+    const isPartial = condition === 'partial';
+    const isCredit  = condition === 'store-credit';
+    const refundAmt = isPartial
+      ? (parseFloat(document.getElementById('re-partial-amt').value)||0)
+      : isCredit ? 0 : returnVal;
+    const refundMethod = isCredit ? 'Store Credit' : document.getElementById('re-refund-method').value;
+
+    logEntry = { ...logEntry, refundAmt, refundMethod, condition };
+
+    // Mark items as returned in the original sale
+    const updatedItems = (sale.items||[]).map(item => {
+      const idx = returnedItems.findIndex(r => r.product===item.product && r.price===item.price);
+      return idx>=0 ? {...item, returned:true} : item;
+    });
+
+    const updated = {
+      ...sale,
+      items: updatedItems,
+      hasReturn: true,
+      returnRefund: (sale.returnRefund||0) + refundAmt,
+      returnExchangeLog: [...(sale.returnExchangeLog||[]), logEntry]
+    };
+
+    const sidx = sales.findIndex(s=>s.id===viewingSaleId);
+    if (sidx>=0) sales[sidx] = updated;
+    saveSales();
+    await pushSaleToCloud(updated);
+
+    waMsg = `↩ *RETURN — ${S.shopName}*\nBill: ${sale.id}\nDate: ${new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}\nBy: ${logEntry.by}\n\n`
+      + `*Returned Items:*\n${returnedItems.map(i=>`  • ${i.product}${i.qty>1?' ×'+i.qty:''} — ₹${((i.price||0)*(i.qty||1)).toLocaleString('en-IN')}`).join('\n')}\n\n`
+      + `Condition: ${condition==='good'?'Good':condition==='partial'?'Partial/Used':'Store Credit'}\n`
+      + `*Refund: ₹${refundAmt.toLocaleString('en-IN')} via ${refundMethod}*\n`
+      + `Customer: ${sale.custName||'—'} ${sale.custMobile||''}\nReason: ${reason}`;
+
+  } else {
+    // Exchange
+    const newTotal = reNewItems.reduce((a,i)=>a+(parseFloat(i.price)||0),0);
+    const diff = newTotal - returnVal;
+    const diffMethod = document.getElementById('re-exch-method').value;
+
+    logEntry = { ...logEntry, newItems: reNewItems.map(i=>({name:i.name, price:+i.price})), diff, diffMethod };
+
+    const updatedItems = (sale.items||[]).map(item => {
+      const idx = returnedItems.findIndex(r => r.product===item.product && r.price===item.price);
+      return idx>=0 ? {...item, exchanged:true} : item;
+    });
+
+    // Add new exchange items to the sale
+    reNewItems.forEach(ni => {
+      updatedItems.push({product:ni.name, price:+ni.price, qty:1, exchangeItem:true});
+    });
+
+    const updated = {
+      ...sale,
+      items: updatedItems,
+      hasExchange: true,
+      returnExchangeLog: [...(sale.returnExchangeLog||[]), logEntry]
+    };
+
+    const sidx = sales.findIndex(s=>s.id===viewingSaleId);
+    if (sidx>=0) sales[sidx] = updated;
+    saveSales();
+    await pushSaleToCloud(updated);
+
+    waMsg = `🔀 *EXCHANGE — ${S.shopName}*\nBill: ${sale.id}\nDate: ${new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}\nBy: ${logEntry.by}\n\n`
+      + `*Returned:*\n${returnedItems.map(i=>`  • ${i.product}${i.qty>1?' ×'+i.qty:''} — ₹${((i.price||0)*(i.qty||1)).toLocaleString('en-IN')}`).join('\n')}\n\n`
+      + `*New Items:*\n${reNewItems.map(i=>`  • ${i.name} — ₹${(+i.price).toLocaleString('en-IN')}`).join('\n')}\n\n`
+      + `*Difference: ${diff>=0?'Customer pays':'Refund'} ₹${Math.abs(diff).toLocaleString('en-IN')} via ${diffMethod}*\n`
+      + `Customer: ${sale.custName||'—'} ${sale.custMobile||''}\nReason: ${reason}`;
+  }
+
+  // Notify owner via WhatsApp
+  if (S.ownerMobile) {
+    window.open(`https://wa.me/${S.ownerMobile}?text=${encodeURIComponent(waMsg)}`, '_blank');
+  }
+
+  closeModal('return-modal');
+  renderHistoryStats();
+  renderHistory();
+  setTimeout(() => viewSale(viewingSaleId), 400);
 }
 
 // ===================== MODAL =====================
