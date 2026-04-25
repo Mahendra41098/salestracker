@@ -253,7 +253,7 @@ textarea{resize:vertical;min-height:54px}
 .modal-handle{width:34px;height:4px;background:var(--b2);border-radius:2px;margin:0 auto 14px}
 
 /* PASSWORD LOCK SCREEN */
-.lock-screen{position:fixed;inset:0;background:var(--bg);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.lock-screen{position:fixed;inset:0;background:var(--bg);z-index:300;flex-direction:column;align-items:center;justify-content:center;padding:24px}
 .lock-icon{font-size:48px;margin-bottom:16px}
 .lock-title{font-size:20px;font-weight:800;color:var(--a);margin-bottom:6px}
 .lock-sub{font-size:13px;color:var(--t3);margin-bottom:28px;text-align:center}
@@ -273,25 +273,26 @@ textarea{resize:vertical;min-height:54px}
 .add-area:hover{border-color:var(--a);color:var(--a)}
 select.native{background:var(--s2);border:1.5px solid var(--b);border-radius:var(--rad);padding:9px 12px;color:var(--t);font-size:13px;outline:none;cursor:pointer}
 
-@media(min-width:600px){.page,.nav,.lock-screen{max-width:480px;margin-left:auto;margin-right:auto}.lock-screen{left:50%;transform:translateX(-50%);width:480px}}
+@media(min-width:600px){.page,.nav{max-width:480px;margin-left:auto;margin-right:auto}
+  #lock-screen{max-width:480px;margin-left:auto;margin-right:auto;left:0;right:0}}
 </style>
 </head>
 <body>
 
 <!-- ===== LOCK SCREEN ===== -->
-<div class="lock-screen" id="lock-screen">
+<div id="lock-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:300;flex-direction:column;align-items:center;justify-content:center;padding:24px">
   <div class="lock-icon">🔐</div>
   <div class="lock-title">History is Locked</div>
-  <div class="lock-sub">Enter your owner password to access<br>sales history &amp; profit data</div>
+  <div class="lock-sub">Enter owner password to access<br>sales history &amp; profit data</div>
   <input class="lock-input" type="password" id="lock-input" placeholder="••••••••" maxlength="20"
     oninput="lockErr('')" onkeydown="if(event.key==='Enter')unlockHistory()">
   <div class="lock-err" id="lock-err"></div>
-  <button class="btn btn-primary" style="max-width:280px;width:100%" onclick="unlockHistory()">Unlock History</button>
+  <button class="btn btn-primary" style="max-width:280px;width:100%;margin-top:4px" onclick="unlockHistory()">Unlock History</button>
   <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="goToSaleFromLock()">← Back to Sale</button>
 </div>
 
 <!-- ===== MAIN APP ===== -->
-<div id="main-app" style="display:none">
+<div id="main-app">
 
 <div class="nav">
   <div class="nav-brand" id="nav-brand">SalesPro<span>Sales Tracker</span></div>
@@ -1177,8 +1178,6 @@ function executeClearHistory() {
 // ===================== INIT =====================
 function init() {
   loadData();
-  document.getElementById('main-app').style.display = 'block';
-  document.getElementById('lock-screen').style.display = 'none';
   updateNavBrand();
   renderSalesmanChips();
   addItem();
@@ -1193,7 +1192,6 @@ function init() {
   renderCodeTable();
   renderPayMethodsSet();
   renderSalesmanFilter();
-  // Start real-time Firebase listener — fully automatic from here
   startRealtimeSync();
 }
 
@@ -1203,38 +1201,46 @@ function updateNavBrand() {
 
 // ===================== PASSWORD / LOCK =====================
 function getHistPass() {
-  return S.ownerMobile.trim();
+  return (S.histPassword && S.histPassword.trim()) ? S.histPassword.trim() : S.ownerMobile.trim();
+}
+
+function showLock() {
+  document.getElementById('lock-input').value = '';
+  document.getElementById('lock-err').textContent = '';
+  document.getElementById('lock-screen').style.display = 'flex';
+}
+function hideLock() {
+  document.getElementById('lock-screen').style.display = 'none';
 }
 
 function tryHistory(el) {
   if (histUnlocked) { goTab('history', el); return; }
-  // Show lock screen
-  document.getElementById('lock-input').value = '';
-  document.getElementById('lock-err').textContent = '';
-  document.getElementById('main-app').style.display = 'none';
-  document.getElementById('lock-screen').style.display = 'flex';
+  showLock();
 }
 
 function unlockHistory() {
   const entered = document.getElementById('lock-input').value.trim();
   const pass = getHistPass();
-  if (!pass) { // no password set — allow access
+  if (!pass) {
+    // No password configured — let everyone in
     histUnlocked = true;
-    returnToHistory();
+    hideLock();
+    goTab('history', document.getElementById('tab-history'));
     return;
   }
   if (entered === pass) {
     histUnlocked = true;
-    returnToHistory();
+    hideLock();
+    goTab('history', document.getElementById('tab-history'));
   } else {
     lockErr('Wrong password. Try again.');
     document.getElementById('lock-input').value = '';
+    document.getElementById('lock-input').focus();
   }
 }
 
 function returnToHistory() {
-  document.getElementById('lock-screen').style.display = 'none';
-  document.getElementById('main-app').style.display = 'block';
+  hideLock();
   goTab('history', document.getElementById('tab-history'));
 }
 
@@ -1246,8 +1252,7 @@ function lockHistoryNow() {
 function lockErr(msg) { document.getElementById('lock-err').textContent = msg; }
 
 function goToSaleFromLock() {
-  document.getElementById('lock-screen').style.display = 'none';
-  document.getElementById('main-app').style.display = 'block';
+  hideLock();
   goTab('sale', document.getElementById('tab-sale'));
 }
 
@@ -1882,7 +1887,6 @@ function viewSale(id) {
   document.getElementById('resend-cust-btn').style.opacity = sale.custMobile ? '1' : '0.4';
   openModal('detail-modal');
 }
-}
 
 function deleteSale() {
   if (!viewingSaleId || !confirm('Delete this sale permanently?')) return;
@@ -1965,12 +1969,6 @@ function removePayMethod(i) {
   S.payMethods.splice(i,1); saveS();
   renderPayMethodsSet(); renderSingleMethods(); renderSplitRows(); renderDueMethodSelect();
 }
-// ===================== MODAL =====================
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(el => {
-  el.addEventListener('click', e => { if(e.target===el) el.classList.remove('open'); });
-});
 
 // ===================== THEMES =====================
 // Each palette has DARK variant and LIGHT (pastel) variant
